@@ -1,19 +1,31 @@
-# Carregar as bibliotecas necessÃ¡rias
+# Carregar as bibliotecas necessárias
 library(ggplot2)
-library(stats)
+library(gridExtra)
+library(readr)
 
-# Supondo que 'filtered_data' e 'new_final_data' sÃ£o data frames jÃ¡ carregados
-# Se necessÃ¡rio, substitua pela carga dos seus dados
-# filtered_data <- read.csv('filtered_data.csv')
-# new_final_data <- read.csv('new_final_data.csv')
+# Caminho para o arquivo CSV
+caminho_arquivo <- "C:\\Users\\thgcn\\OneDrive\\Academico\\Financial-Reports-Impact\\retornos_finais.csv"
 
-# Selecionando os retornos
-nxt_return <- filtered_data$nxt_return
-Return <- new_final_data$Return
-week_return <- new_final_data$week_return
-month_return <- new_final_data$month_return
+# Carregar o arquivo CSV e verificar a especificação das colunas
+data <- read_csv(caminho_arquivo, show_col_types = TRUE)
 
-# FunÃ§Ã£o para plotar QQ plot
+# Selecionar as colunas corretas
+Return <- data$Returns
+nxt_return <- data$nxt_return
+remaining_return_week <- data$remaining_return_week
+first_return_week <- data$first_return_week
+remaining_return_month <- data$remaining_return_month
+first_return_month <- data$first_return_month
+
+# Remover NAs e converter para numérico
+Return <- as.numeric(na.omit(Return))
+nxt_return <- as.numeric(na.omit(nxt_return))
+remaining_return_week <- as.numeric(na.omit(remaining_return_week))
+first_return_week <- as.numeric(na.omit(first_return_week))
+remaining_return_month <- as.numeric(na.omit(remaining_return_month))
+first_return_month <- as.numeric(na.omit(first_return_month))
+
+# Função para plotar QQ plot
 qq_plot <- function(data, title) {
   # Criar um dataframe para ggplot
   data_df <- data.frame(sample = data)
@@ -25,12 +37,18 @@ qq_plot <- function(data, title) {
     ggtitle(title) +
     theme_minimal()
   
-  # Mostrar o grÃ¡fico
-  print(p)
+  # Retornar o gráfico ggplot
+  return(p)
 }
 
-# Gerando QQ plots para comparar os quantis
-qq_plot(nxt_return, 'QQ plot for nxt_return')
-qq_plot(Return, 'QQ plot for Return')
-qq_plot(week_return, 'QQ plot for week_return')
-qq_plot(month_return, 'QQ plot for month_return')
+# Criar os gráficos
+plot1 <- qq_plot(Return, "Retornos diários sem influência")
+plot2 <- qq_plot(nxt_return, "Retornos diários com influência")
+plot3 <- qq_plot(remaining_return_week, "Retornos semanais sem influência")
+plot4 <- qq_plot(first_return_week, "Retornos semanais com influência")
+plot5 <- qq_plot(remaining_return_month, "Retornos mensais sem influência")
+plot6 <- qq_plot(first_return_month, "Retornos mensais com influência")
+
+# Organizar os gráficos em uma grade
+
+grid.arrange(plot1, plot2, plot3, plot4, plot5, plot6, nrow = 3)
