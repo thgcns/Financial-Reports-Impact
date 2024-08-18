@@ -1,0 +1,16 @@
+Comparison,Test,Statistic_1,p-value_1,Statistic_2,p-value_2
+Return vs nxt_return,Shapiro-Wilk Test,0.908681333065033,1.0467559398659951e-40,0.9870011806488037,0.8061773180961609
+Return vs nxt_return,Kolmogorov-Smirnov Test,0.17649665009725524,0.05694736109797651,,
+Return vs nxt_return,Levene Test,12.157127284498602,0.0004952741720380059,,
+Return vs nxt_return,Chow Test,-inf,,,
+Return vs nxt_return,Student's t-test,0.4024371407072902,0.68889315357424,,
+remaining_return_week vs first_return_week,Shapiro-Wilk Test,0.9443933367729187,3.722621034129778e-14,0.9568800330162048,0.043591782450675964
+remaining_return_week vs first_return_week,Kolmogorov-Smirnov Test,0.1417785234899329,0.2307180940529117,,
+remaining_return_week vs first_return_week,Levene Test,2.956750266211528,0.08599571291474356,,
+remaining_return_week vs first_return_week,Chow Test,-inf,,,
+remaining_return_week vs first_return_week,Student's t-test,0.2957689528058297,0.7683746680501997,,
+remaining_return_month vs first_return_month,Shapiro-Wilk Test,0.9582533836364746,0.01762629859149456,0.7094891667366028,3.2012841266748637e-09
+remaining_return_month vs first_return_month,Kolmogorov-Smirnov Test,0.12896825396825398,0.6192408237052518,,
+remaining_return_month vs first_return_month,Levene Test,0.00014101241310066084,0.9905442330543991,,
+remaining_return_month vs first_return_month,Chow Test,,,,
+remaining_return_month vs first_return_month,Student's t-test,0.2972778632546702,0.7668726202466266,,
