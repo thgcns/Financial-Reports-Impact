@@ -1,0 +1,85 @@
+def corr_pair(stock1, stock2, start_date, end_date, window_size):
+    # Carregar os dados
+    stock1_data = pd.read_csv(f"dataset/prices_processed/{stock1}.SA.csv")
+    stock2_data = pd.read_csv(f"dataset/prices_processed/{stock2}.SA.csv")
+    
+    # Filtrar as colunas relevantes
+    stock1_return = stock1_data[['Date', 'event', 'Daily_Return']]
+    stock2_return = stock2_data[['Date', 'event', 'Daily_Return']]   
+       
+    # Mesclar os dados com base na data
+    merged_data = pd.merge(stock1_return, stock2_return, on='Date', suffixes=(f'_{stock1}', f'_{stock2}'))
+    
+    # Filtrar o DataFrame com base nas datas fornecidas
+    filtered_data = merged_data[(merged_data['Date'] >= start_date) & (merged_data['Date'] <= end_date)]
+    
+    # Separar os dados entre os períodos de publicação e fora deles
+    period_event = filtered_data[(filtered_data[f'event_{stock1}'] == 1) | (filtered_data[f'event_{stock2}'] == 1)]
+    
+    #Calcular as janelas de publicação:
+    event_window = set()
+    event_indices = period_event.index
+    for idx in event_indices:
+    # Adicionar o intervalo de - (window-1) até + (window-1) em torno do índice do evento
+        for offset in range(- (int(window_size) - 1), int(window_size)):
+            event_window.add(idx + offset)
+    
+    #Filtrar os periodos    
+    filtered_data_no_event_window = filtered_data.drop(event_window, errors='ignore')
+    filtered_data_event_window = filtered_data.loc[list(event_window)]
+    
+    # Calcular a correlação móvel entre os retornos diários dos diferentes periodos       
+    filtered_data['Rolling_Correlation'] = filtered_data[f'Daily_Return_{stock1}'].rolling(window=int(window_size)).corr(filtered_data[f'Daily_Return_{stock2}'])
+    filtered_data_no_event_window['Rolling_Correlation'] = filtered_data_no_event_window[f'Daily_Return_{stock1}'].rolling(window=int(window_size)).corr(filtered_data_no_event_window[f'Daily_Return_{stock2}'])
+    filtered_data_event_window['Rolling_Correlation'] = filtered_data_event_window[f'Daily_Return_{stock1}'].rolling(window=int(window_size)).corr(filtered_data_event_window[f'Daily_Return_{stock2}'])
+       
+
+    # Calcular correlações médias nos diferentes períodos
+    overall_corr = filtered_data['Rolling_Correlation'].mean()    
+    non_event_corr = filtered_data_no_event_window['Rolling_Correlation'].mean()
+    event_corr = filtered_data_event_window['Rolling_Correlation'].mean()
+    
+    # Exibir as correlações médias
+    print(f"Correlação média geral: {overall_corr:.4f}")
+    print(f"Correlação média durante os períodos de publicação: {event_corr:.4f}")
+    print(f"Correlação média fora dos períodos de publicação: {non_event_corr:.4f}")
+    
+    # Criar o gráfico
+    plt.figure(figsize=(20, 7))
+    
+    # Plotar a correlação diária
+    plt.plot(filtered_data['Date'], filtered_data['Rolling_Correlation'], label=f'Correlação Diária ({window_size}-dias)', color='black')
+    
+    # Adicionar marcações verticais para eventos
+    event_stock1_dates = filtered_data[filtered_data[f'event_{stock1}'] == 1]['Date'].values
+    event_stock2_dates = filtered_data[filtered_data[f'event_{stock2}'] == 1]['Date'].values
+    
+    # Adicionar linhas verticais para eventos do stock1
+    for date in event_stock1_dates:
+        plt.axvline(x=date, color='blue', linestyle='--', linewidth=0.8, label=f'Evento {stock1}' if date == event_stock1_dates[0] else "")
+    
+    # Adicionar linhas verticais para eventos do stock2
+    for date in event_stock2_dates:
+        plt.axvline(x=date, color='red', linestyle='--', linewidth=0.8, label=f'Evento {stock2}' if date == event_stock2_dates[0] else "")
+    
+    # Configurar o gráfico
+    plt.xlabel('Data')
+    plt.ylabel('Correlação')
+    plt.title(f'Correlação Diária entre os Retornos de {stock1} e {stock2}')
+    plt.legend()
+    plt.grid(True)
+    
+    # Exibir o gráfico
+    plt.show()
+
+    # Imprimir as datas dos eventos
+    print(f"Datas das publicações '{stock1}':")
+    for date in event_stock1_dates:
+        print(date)
+    
+    print(f"\nDatas das publicações '{stock2}':")
+    for date in event_stock2_dates:
+        print(date)
+
+# Chame a função com os parâmetros desejados
+corr_pair('ITUB4', 'SANB11', '2020-01-01', '2020-12-31', 5)
