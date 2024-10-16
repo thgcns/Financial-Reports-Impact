@@ -1,0 +1,7 @@
+Comparison,Test,Statistic_1,p-value_1,Statistic_2,p-value_2
+Return vs nxt_return,Test1,1.0,0.05,1.1,0.04
+Return vs nxt_return,Test2,2.0,0.01,2.1,0.02
+remaining_return_week vs first_return_week,Test1,1.0,0.05,1.1,0.04
+remaining_return_week vs first_return_week,Test2,2.0,0.01,2.1,0.02
+remaining_return_month vs first_return_month,Test1,1.0,0.05,1.1,0.04
+remaining_return_month vs first_return_month,Test2,2.0,0.01,2.1,0.02
